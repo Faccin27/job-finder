@@ -428,7 +428,6 @@ export default function Home() {
   );
 }
 
-// Componente do Modal de Login (você precisará criar este arquivo separadamente)
 interface LoginModalProps {
   onClose: () => void;
 }
@@ -442,9 +441,7 @@ function LoginModal({ onClose }: LoginModalProps) {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulação de login
     try {
-      // Aqui você implementaria a lógica real de autenticação
       await new Promise(resolve => setTimeout(resolve, 1000));
       console.log("Login com:", email, password);
       onClose();
