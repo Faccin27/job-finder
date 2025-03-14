@@ -1,37 +1,108 @@
 "use client"
 
+import { useState } from "react"
+
 interface ClientFormProps {
   onBack: () => void
 }
 
 export default function ClientForm({ onBack }: ClientFormProps) {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    phone: "",
+    picture: "", // Opcional: pode ser um campo oculto ou gerado automaticamente
+  })
+
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value })
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError(null)
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("As senhas não coincidem.")
+      return
+    }
+
+    setLoading(true)
+
+    try {
+      const response = await fetch("http://localhost:3535/users/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          role: "CLIENTE",
+          picture: formData.picture || "https://exemplo.com/foto.jpg",
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Erro ao cadastrar cliente")
+      }
+
+      alert("Cadastro realizado com sucesso!")
+      setFormData({
+        name: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+        phone: "",
+        picture: "",
+      })
+    } catch (err) {
+      setError((err as Error).message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="w-full max-w-md bg-white rounded-lg shadow-xl p-8 animate-fadeIn">
       <h2 className="text-3xl font-bold mb-6 text-gray-800 text-center">
         Cadastro de <span className="text-yellow-500">Cliente</span>
       </h2>
-      <form className="space-y-4">
+      {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+      <form className="space-y-4" onSubmit={handleSubmit}>
         <div>
-          <label className="block text-gray-700 mb-2" htmlFor="name-client">
+          <label className="block text-gray-700 mb-2" htmlFor="name">
             Nome Completo
           </label>
           <input
             type="text"
-            id="name-client"
+            id="name"
             className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
             placeholder="Digite seu nome"
+            value={formData.name}
+            onChange={handleChange}
+            required
           />
         </div>
 
         <div>
-          <label className="block text-gray-700 mb-2" htmlFor="email-client">
+          <label className="block text-gray-700 mb-2" htmlFor="email">
             E-mail
           </label>
           <input
             type="email"
-            id="email-client"
+            id="email"
             className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
             placeholder="Digite seu e-mail"
+            value={formData.email}
+            onChange={handleChange}
+            required
           />
         </div>
 
@@ -44,38 +115,47 @@ export default function ClientForm({ onBack }: ClientFormProps) {
             id="phone"
             className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
             placeholder="Digite seu telefone"
+            value={formData.phone}
+            onChange={handleChange}
           />
         </div>
 
         <div>
-          <label className="block text-gray-700 mb-2" htmlFor="password-client">
+          <label className="block text-gray-700 mb-2" htmlFor="password">
             Senha
           </label>
           <input
             type="password"
-            id="password-client"
+            id="password"
             className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
             placeholder="Crie uma senha"
+            value={formData.password}
+            onChange={handleChange}
+            required
           />
         </div>
 
         <div>
-          <label className="block text-gray-700 mb-2" htmlFor="confirm-password-client">
+          <label className="block text-gray-700 mb-2" htmlFor="confirmPassword">
             Confirmar Senha
           </label>
           <input
             type="password"
-            id="confirm-password-client"
+            id="confirmPassword"
             className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
             placeholder="Confirme sua senha"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            required
           />
         </div>
 
         <button
           type="submit"
           className="w-full p-3 cursor-pointer bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+          disabled={loading}
         >
-          Cadastrar como Cliente
+          {loading ? "Cadastrando..." : "Cadastrar como Cliente"}
         </button>
 
         <div className="text-center mt-4">
@@ -94,4 +174,3 @@ export default function ClientForm({ onBack }: ClientFormProps) {
     </div>
   )
 }
-
