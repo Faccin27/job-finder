@@ -1,32 +1,47 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { useState } from "react"
+import { useState } from "react";
 
 interface LoginModalProps {
-  onClose: () => void
+  onClose: () => void;
 }
 
 export default function LoginModal({ onClose }: LoginModalProps) {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      console.log("Login com:", email, password)
-      onClose()
-    } catch (error) {
-      console.error("Erro no login:", error)
+      const res = await fetch("http://localhost:3535/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // Permite envio/recebimento de cookies HTTP-only
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Erro ao fazer login.");
+      }
+
+      console.log("Login bem-sucedido!", data);
+      onClose();
+    } catch (error: any) {
+      setError(error.message);
+      console.error("Erro no login:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
@@ -51,6 +66,8 @@ export default function LoginModal({ onClose }: LoginModalProps) {
         <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
           Entrar no <span className="text-yellow-500">JobFinder</span>
         </h2>
+
+        {error && <p className="text-red-500 text-sm text-center mb-4">{error}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -83,26 +100,6 @@ export default function LoginModal({ onClose }: LoginModalProps) {
             />
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                className="h-4 w-4 text-yellow-500 focus:ring-yellow-500 border-gray-300 rounded"
-              />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-                Lembrar-me
-              </label>
-            </div>
-
-            <div className="text-sm">
-              <a href="#" className="text-yellow-500 hover:text-yellow-700">
-                Esqueceu a senha?
-              </a>
-            </div>
-          </div>
-
           <button
             type="submit"
             disabled={isLoading}
@@ -110,18 +107,8 @@ export default function LoginModal({ onClose }: LoginModalProps) {
           >
             {isLoading ? "Entrando..." : "Entrar"}
           </button>
-
-          <div className="text-center mt-4">
-            <p className="text-sm text-gray-600">
-              Não tem uma conta?{" "}
-              <button type="button" onClick={onClose} className="text-yellow-500 hover:text-yellow-700">
-                Cadastre-se
-              </button>
-            </p>
-          </div>
         </form>
       </div>
     </div>
-  )
+  );
 }
-
