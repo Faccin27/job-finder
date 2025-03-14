@@ -117,6 +117,7 @@ export default function ClientForm({ onBack }: ClientFormProps) {
             placeholder="Digite seu telefone"
             value={formData.phone}
             onChange={handleChange}
+            required
           />
         </div>
 
