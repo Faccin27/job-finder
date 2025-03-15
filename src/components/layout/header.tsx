@@ -1,26 +1,34 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import Image from "next/image"
-import LoginModal from "../register/login-modal"
+import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import LoginModal from "../register/login-modal";
 
 // Define user type based on API response
 type User = {
-  id: number
-  name: string
-  email: string
-  role: string
-  picture: string | null
-  job: string | null
-  createdAt: string
-}
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  picture: string | null;
+  job: string | null;
+  createdAt: string;
+};
 
 export default function Navbar() {
-  const [isLoginOpen, setIsLoginOpen] = useState<boolean>(false)
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState<boolean>(true)
-  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false)
+  const [isLoginOpen, setIsLoginOpen] = useState<boolean>(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+
+  const handleLogout = useCallback(async () => {
+    await fetch("http://localhost:3535/users/logout", {
+      method: "POST",
+      credentials: "include",
+    });
+    window.location.reload();
+  }, []);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -39,14 +47,14 @@ export default function Navbar() {
           setUser(userData);
         }
       } catch (error) {
-        console.error("Error fetching user:", error)
+        console.error("Error fetching user:", error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchUser()
-  }, [])
+    fetchUser();
+  }, []);
 
   if (loading) {
     return (
@@ -60,7 +68,7 @@ export default function Navbar() {
           <div className="animate-pulse h-8 w-24 bg-gray-200 rounded-lg"></div>
         </div>
       </nav>
-    )
+    );
   }
 
   if (user) {
@@ -74,13 +82,22 @@ export default function Navbar() {
           </div>
 
           <nav className="hidden md:flex items-center gap-6">
-            <Link href="/" className="font-medium text-gray-900 hover:text-yellow-500 transition-colors">
+            <Link
+              href="/"
+              className="font-medium text-gray-900 hover:text-yellow-500 transition-colors"
+            >
               Início
             </Link>
-            <Link href="/" className="font-medium text-gray-900 hover:text-yellow-500 transition-colors">
+            <Link
+              href="/"
+              className="font-medium text-gray-900 hover:text-yellow-500 transition-colors"
+            >
               Categorias
             </Link>
-            <Link href="/" className="font-medium text-gray-900 hover:text-yellow-500 transition-colors">
+            <Link
+              href="/"
+              className="font-medium text-gray-900 hover:text-yellow-500 transition-colors"
+            >
               Explorar
             </Link>
           </nav>
@@ -105,17 +122,26 @@ export default function Navbar() {
               )}
               <span className="font-medium hidden md:block">{user.name}</span>
             </div>
-
             {isDropdownOpen && (
               <div className="absolute -right-5 mt-2 w-36 bg-white border border-gray-200 rounded-lg shadow-lg">
-                <Link href="/profile" className="block px-4 py-2 text-gray-900 hover:bg-gray-100">Perfil</Link>
-                <button className="w-full text-left block px-4 py-2 text-gray-900 hover:bg-gray-100">Sair</button>
+                <Link
+                  href="/profile"
+                  className="block px-4 py-2 text-gray-900 hover:bg-gray-100"
+                >
+                  Perfil
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left block px-4 py-2 text-gray-900 hover:bg-gray-100"
+                >
+                  Sair
+                </button>
               </div>
             )}
           </div>
         </div>
       </header>
-    )
+    );
   }
 
   return (
@@ -138,5 +164,5 @@ export default function Navbar() {
 
       {isLoginOpen && <LoginModal onClose={() => setIsLoginOpen(false)} />}
     </nav>
-  )
+  );
 }
