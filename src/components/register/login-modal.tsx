@@ -35,6 +35,7 @@ export default function LoginModal({ onClose }: LoginModalProps) {
 
       console.log("Login bem-sucedido!", data);
       onClose();
+      window.location.reload()
     } catch (error: any) {
       setError(error.message);
       console.error("Erro no login:", error);
