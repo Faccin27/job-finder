@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
+import LoginModal from "../register/login-modal"
 
 // Define user type based on API response
 type User = {
@@ -23,18 +24,19 @@ export default function Navbar() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        console.log("entrou no fetch")
+        // Get token from cookies
+        console.log("Verificando login do usuário...");
 
         const response = await fetch("http://localhost:3535/users/me", {
-          credentials: "include", // Permite que cookies sejam enviados automaticamente
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },
-        })
+        });
 
         if (response.ok) {
-          const userData = await response.json()
-          setUser(userData)
+          const userData = await response.json();
+          setUser(userData); 
         }
       } catch (error) {
         console.error("Error fetching user:", error)
@@ -124,13 +126,14 @@ export default function Navbar() {
         <div className="space-x-4">
           <button
             className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors cursor-pointer"
-            onClick={() => window.open("/")}
+            onClick={() => setIsLoginOpen(true)}
           >
             Entrar
           </button>
         </div>
       </div>
 
+      {isLoginOpen && <LoginModal onClose={() => setIsLoginOpen(false)} />}
     </nav>
   )
 }

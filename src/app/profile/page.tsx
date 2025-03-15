@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import ProfileHeader from "@/components/profile/profile/profile-header";
@@ -10,17 +10,17 @@ import LogoutSection from "@/components/profile/profile/logout-section";
 import SuccessAlert from "@/components/profile/ui/success-alert";
 
 export default function ProfilePage() {
-  // Estado do usuário
-  const [user, setUser] = useState({
-    name: "Willian Deitosi",
-    email: "Willian@sexyshop.com",
-    phone: "(11) 98765-4321",
-    profession: "Encanador",
-    memberSince: "12 de Março de 1824",
-    avatar: "/placeholder.svg?height=200&width=200",
-  });
+  const [user, setUser] = useState<{
+    name: string;
+    email: string;
+    phone: string;
+    profession: string;
+    memberSince: string;
+    avatar: string;
+  } | null>(null);
 
-  const [successMessage, setSuccessMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true);
 
   // Função para mostrar mensagem de sucesso
   const showSuccessMessage = (message: string) => {
@@ -30,7 +30,7 @@ export default function ProfilePage() {
 
   // Função para atualizar o avatar
   const updateAvatar = (avatarUrl: string) => {
-    setUser({ ...user, avatar: avatarUrl });
+    setUser((prevUser) => prevUser ? { ...prevUser, avatar: avatarUrl } : prevUser);
     showSuccessMessage("Foto de perfil atualizada com sucesso!");
   };
 
@@ -39,6 +39,42 @@ export default function ProfilePage() {
     setUser(updatedUser);
     showSuccessMessage("Informações atualizadas com sucesso!");
   };
+
+  // Função para buscar o usuário
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        console.log("Verificando login do usuário...");
+
+        const response = await fetch("http://localhost:3535/users/me", {
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (response.ok) {
+          const userData = await response.json();
+          console.log(userData)
+          setUser(userData); // Usuário logado
+        }
+      } catch (error) {
+        console.error("Erro ao buscar usuário:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  if (loading) {
+    return <div>Carregando...</div>;
+  }
+
+  if (!user) {
+    return <div>Usuário não encontrado.</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
