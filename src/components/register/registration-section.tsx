@@ -6,30 +6,7 @@ import ProviderForm from "./provider-form"
 import ClientForm from "./client-form"
 import client from '@/assets/client.png'
 import presta from '@/assets/presta.png'
-
-const professions: string[] = [
-  "Encanador",
-  "Eletricista",
-  "Carpinteiro",
-  "Pintor",
-  "Mecânico",
-  "Jardineiro",
-  "Arquiteto",
-  "Engenheiro Civil",
-  "Designer de Interiores",
-  "Pedreiro",
-  "Gesseiro",
-  "Motorista",
-  "Fotógrafo",
-  "Cabeleireiro",
-  "Advogado",
-  "Contador",
-  "Professor",
-  "Médico",
-  "Enfermeiro",
-  "Desenvolvedor Web",
-  "Designer Gráfico",
-]
+import { professions } from "@/data/jobs"
 
 type ColumnType = "provider" | "client" | null
 

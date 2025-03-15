@@ -73,7 +73,7 @@ export default function ProfilePage() {
   }
 
   if (!user) {
-    return <div>Usuário não encontrado.</div>;
+    window.location.href = "/register"
   }
 
   return (
@@ -89,7 +89,7 @@ export default function ProfilePage() {
           <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-8">
             <ProfileHeader user={user} onAvatarChange={updateAvatar} />
 
-            <div className="p-6">
+            <div className="p-6 z-10">
               <h3 className="text-xl font-semibold text-gray-900 mb-4">
                 Informações Pessoais
               </h3>
