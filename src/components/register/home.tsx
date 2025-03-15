@@ -1,7 +1,7 @@
 "use client"
 
-import Navbar from "./navbar"
-import Footer from "./footer"
+import Navbar from "../layout/header"
+import {Footer} from "../layout/footer"
 import RegistrationSection from "./registration-section"
 
 export default function Home() {
@@ -23,6 +23,8 @@ export default function Home() {
         <RegistrationSection />
       </main>
 
+
+      <div className="mt-52"></div>
       <Footer />
     </div>
   )
