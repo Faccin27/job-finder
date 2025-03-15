@@ -7,9 +7,9 @@ type UserInfo = {
   name: string;
   email: string;
   phone: string;
-  profession: string;
+  job: string;
   avatar: string;
-  memberSince: string;
+  createdAt: string;
 };
 
 type PersonalInfoFormProps = {
@@ -128,7 +128,7 @@ export default function PersonalInfoForm({
               type="text"
               id="profession"
               name="profession"
-              value={formData.profession}
+              value={formData.job}
               onChange={handleChange}
               className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
             />

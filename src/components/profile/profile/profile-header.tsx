@@ -9,8 +9,8 @@ import Willian from '@/assets/willian.png'
 type ProfileHeaderProps = {
   user: {
     name: string
-    profession: string
-    memberSince: string
+    job: string
+    createdAt: string
     avatar: StaticImageData
   }
   onAvatarChange: (avatarUrl: string) => void
@@ -49,10 +49,10 @@ export default function ProfileHeader({ user, onAvatarChange }: ProfileHeaderPro
 
       <div className="text-center md:text-left">
         <h2 className="text-2xl font-bold text-gray-900">{user.name}</h2>
-        <p className="text-gray-500">{user.profession}</p>
+        <p className="text-gray-500">{user.job}</p>
         <div className="flex items-center justify-center md:justify-start mt-2 text-sm text-gray-500">
           <Calendar size={16} className="mr-1" />
-          <span>Membro desde {user.memberSince}</span>
+          <span>Membro desde {user.createdAt}</span>
         </div>
       </div>
     </div>

@@ -14,8 +14,8 @@ export default function ProfilePage() {
     name: string;
     email: string;
     phone: string;
-    profession: string;
-    memberSince: string;
+    job: string;
+    createdAt: string;
     avatar: string;
   } | null>(null);
 

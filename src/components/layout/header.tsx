@@ -20,11 +20,11 @@ export default function Navbar() {
   const [isLoginOpen, setIsLoginOpen] = useState<boolean>(false)
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false)
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        // Get token from cookies
         console.log("Verificando login do usuário...");
 
         const response = await fetch("http://localhost:3535/users/me", {
@@ -36,7 +36,7 @@ export default function Navbar() {
 
         if (response.ok) {
           const userData = await response.json();
-          setUser(userData); 
+          setUser(userData);
         }
       } catch (error) {
         console.error("Error fetching user:", error)
@@ -48,7 +48,6 @@ export default function Navbar() {
     fetchUser()
   }, [])
 
-  // Show loading state while checking authentication
   if (loading) {
     return (
       <nav className="bg-white shadow-sm py-4 px-6">
@@ -64,7 +63,6 @@ export default function Navbar() {
     )
   }
 
-  // Render authenticated navbar
   if (user) {
     return (
       <header className="sticky top-0 z-10 bg-white shadow-sm">
@@ -87,34 +85,39 @@ export default function Navbar() {
             </Link>
           </nav>
 
-          <div className="flex items-center gap-4">
-            <div className="relative group">
-              <div className="flex items-center gap-2 cursor-pointer">
-                {user.picture ? (
-                  <Image
-                    src={user.picture || "/placeholder.svg"}
-                    alt={user.name}
-                    width={40}
-                    height={40}
-                    className="rounded-full border-2 border-yellow-500"
-                  />
-                ) : (
-                  <div className="w-10 h-10 rounded-full bg-yellow-500 flex items-center justify-center text-white font-bold">
-                    {user.name.charAt(0)}
-                  </div>
-                )}
-                <span className="font-medium hidden md:block">{user.name}</span>
-              </div>
-
-              {/* You can add a dropdown menu here if needed */}
+          <div className="relative">
+            <div
+              className="flex items-center gap-2 cursor-pointer"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            >
+              {user.picture ? (
+                <Image
+                  src={user.picture || "/placeholder.svg"}
+                  alt={user.name}
+                  width={40}
+                  height={40}
+                  className="rounded-full border-2 border-yellow-500"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-yellow-500 flex items-center justify-center text-white font-bold">
+                  {user.name.charAt(0)}
+                </div>
+              )}
+              <span className="font-medium hidden md:block">{user.name}</span>
             </div>
+
+            {isDropdownOpen && (
+              <div className="absolute -right-5 mt-2 w-36 bg-white border border-gray-200 rounded-lg shadow-lg">
+                <Link href="/profile" className="block px-4 py-2 text-gray-900 hover:bg-gray-100">Perfil</Link>
+                <button className="w-full text-left block px-4 py-2 text-gray-900 hover:bg-gray-100">Sair</button>
+              </div>
+            )}
           </div>
         </div>
       </header>
     )
   }
 
-  // Render non-authenticated navbar
   return (
     <nav className="bg-white shadow-sm py-4 px-6">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
@@ -137,4 +140,3 @@ export default function Navbar() {
     </nav>
   )
 }
-
