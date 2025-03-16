@@ -5,33 +5,43 @@ import { User, Mail, Phone, Building, ChevronDown } from "lucide-react";
 import { professions } from "@/data/jobs";
 
 type UserInfo = {
-  name: string;
-  email: string;
-  phone: string;
-  job: string;
-  avatar: string;
-  createdAt: string;
+  name?: string;
+  email?: string;
+  phone?: string;
+  job?: string;
+  picture?: string;
+  avatar?: string;
+  createdAt?: string;
+  role?: string;
 };
 
 type PersonalInfoFormProps = {
   user: UserInfo;
-  onSave: (updatedUser: UserInfo) => void;
+  onSave?: (updatedUser: UserInfo) => void;
 };
 
 export default function PersonalInfoForm({
   user,
   onSave,
 }: PersonalInfoFormProps) {
-  const [formData, setFormData] = useState<UserInfo>(user);
+  const [formData, setFormData] = useState<UserInfo>({
+    name: user.name || "",
+    email: user.email || "",
+    phone: user.phone || "",
+    job: user.job || "",
+    picture: user.picture || user.avatar || "",
+    role: user.role || "PRESTADOR",
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [filteredProfessions, setFilteredProfessions] = useState<string[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [successMessage, setSuccessMessage] = useState<string>("");
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
     if (name === "job") {
-      // Filtra as profissões baseando-se no input
       const filtered = professions.filter((prof) =>
         prof.toLowerCase().includes(value.toLowerCase())
       );
@@ -47,24 +57,88 @@ export default function PersonalInfoForm({
     setShowDropdown(false);
   };
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
+  const updateUserInfo = async (userData: UserInfo) => {
+    try {
+      const response = await fetch("http://localhost:3535/users/update", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+        credentials: "include", 
+      });
 
-    // Impede envio caso a profissão digitada não esteja na lista
-    if (!professions.includes(formData.job)) {
-      alert("Por favor, selecione uma profissão válida da lista.");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Erro ao atualizar informações");
+      }
+
+      return await response.json();
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+      throw new Error("Erro desconhecido ao atualizar informações");
+    }
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    if (formData.job && !professions.includes(formData.job)) {
+      setErrorMessage("Por favor, selecione uma profissão válida da lista.");
+      return;
+    }
+
+    const changedData: UserInfo = {};
+    
+    if (formData.name !== user.name) changedData.name = formData.name;
+    if (formData.email !== user.email) changedData.email = formData.email;
+    if (formData.phone !== user.phone) changedData.phone = formData.phone;
+    if (formData.job !== user.job) changedData.job = formData.job;
+    if (formData.role !== user.role) changedData.role = formData.role;
+    
+    if (Object.keys(changedData).length === 0) {
+      setErrorMessage("Nenhuma alteração detectada.");
       return;
     }
 
     setIsLoading(true);
-    setTimeout(() => {
+    
+    try {
+      await updateUserInfo(changedData);
+      setSuccessMessage("Informações atualizadas com sucesso!");
+      
+      if (onSave) {
+        onSave({ ...user, ...changedData });
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage("Erro ao atualizar informações.");
+      }
+    } finally {
       setIsLoading(false);
-      onSave(formData);
-    }, 1000);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit}>
+      {errorMessage && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {errorMessage}
+        </div>
+      )}
+      
+      {successMessage && (
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+          {successMessage}
+        </div>
+      )}
+      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <div>
           <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
