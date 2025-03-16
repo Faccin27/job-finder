@@ -23,7 +23,7 @@ export default function PasswordSection({
     setPasswords({ ...passwords, [name]: value });
   };
 
-  const handleSavePassword = (e: FormEvent) => {
+  const handleSavePassword = async (e: FormEvent) => {
     e.preventDefault();
 
     if (passwords.new !== passwords.confirm) {
@@ -33,13 +33,33 @@ export default function PasswordSection({
 
     setIsLoading(true);
 
-    // Simulação de uma chamada de API
-    setTimeout(() => {
+    try {
+      const response = await fetch("http://localhost:3535/users/update", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          password: passwords.current,
+          newPassword: passwords.new,
+        }),
+        credentials: "include", 
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao alterar a senha");
+      }
+
       setIsLoading(false);
       setIsEditingPassword(false);
       setPasswords({ current: "", new: "", confirm: "" });
-      onPasswordChange();
-    }, 1000);
+      onPasswordChange(); 
+
+      alert("Senha alterada com sucesso!");
+    } catch (error) {
+      setIsLoading(false);
+      alert("Algo deu errado ao alterar a senha.");
+    }
   };
 
   return (
