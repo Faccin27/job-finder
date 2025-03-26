@@ -11,7 +11,8 @@ type ProfileHeaderProps = {
     name: string
     job: string
     createdAt: string
-    avatar: StaticImageData
+    avatar:  StaticImageData
+    picture: string
   }
   onAvatarChange: (avatarUrl: string) => void
 }
@@ -22,17 +23,17 @@ export default function ProfileHeader({ user, onAvatarChange }: ProfileHeaderPro
   const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      // Aqui parar de simular e integrar cloudinary
       const imageUrl = URL.createObjectURL(file)
       onAvatarChange(imageUrl)
     }
   }
 
+
   return (
     <div className="p-6 border-b border-gray-100 flex flex-col md:flex-row items-center gap-6">
       <div className="relative">
         <Image
-          src={Willian}
+          src={user.picture}
           alt={user.name}
           width={120}
           height={120}
